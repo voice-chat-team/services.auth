@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { UserClient } from './user.client';
+import { UserClientGrpc } from './user.grpc';
 
 @Global()
 @Module({
@@ -9,14 +9,16 @@ import { UserClient } from './user.client';
     ClientsModule.register([
       {
         name: 'USER_SERVICE',
-        transport: Transport.TCP,
+        transport: Transport.GRPC,
         options: {
-          port: 50501,
+          package: 'user.v1',
+          protoPath: 'node_modules/@voice-chat/contracts/proto/user.proto',
+          url: 'localhost:50501',
         },
       },
     ]),
   ],
-  providers: [UserClient],
-  exports: [UserClient],
+  providers: [UserClientGrpc],
+  exports: [UserClientGrpc],
 })
 export class UserModule {}
