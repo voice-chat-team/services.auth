@@ -14,14 +14,14 @@ export class AuthService {
   async loginUser(dto: LoginRequest): Promise<LoginResponse> {
     const { email } = dto;
 
-    const exsistUser = await firstValueFrom(
+    const { user } = await firstValueFrom(
       this.userClientGrpc.getUserByEmail({ email }),
     );
 
-    if (!exsistUser)
+    if (!user)
       throw new RpcException({
-        status: 404,
-        message: 'Пользователь не найден',
+        code: 3,
+        details: 'Неверный email или пароль',
       });
 
     return {
