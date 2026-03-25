@@ -1,21 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  LoginRequest,
-  LoginResponse,
-  RegistrationRequest,
-  RegistrationResponse,
+import {
+  type LoginRequest,
+  type LoginResponse,
+  type RegistrationRequest,
+  type RegistrationResponse,
+  type VerifyTokenRequest,
+  type VerifyTokenResponse,
 } from '@voice-chat/contracts/gen/auth';
 import { RpcException } from '@nestjs/microservices';
 import { combineLatest, firstValueFrom } from 'rxjs';
 import { UserClientGrpc } from '../user/user.grpc';
 
 import bcrypt from 'bcrypt';
+import { PassportService } from '../passport/passport.service';
 
 const SALT_ROUNDS = 10;
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userClientGrpc: UserClientGrpc) {}
+  constructor(
+    private readonly userClientGrpc: UserClientGrpc,
+    private readonly passportService: PassportService,
+  ) {}
 
   async loginUser(dto: LoginRequest): Promise<LoginResponse> {
     const { email, password } = dto;
@@ -39,10 +45,12 @@ export class AuthService {
         details: 'Неверный email или пароль',
       });
 
-    return {
-      accessToken: 'accessToken',
-      refreshToken: 'refreshToken',
-    };
+    const tokens = await this.passportService.generateTokens({
+      userId: user.id,
+      username: user.username,
+    });
+
+    return tokens;
   }
 
   async registrationUser(
@@ -79,6 +87,26 @@ export class AuthService {
         code: 3,
         details: 'Ошибка при регистрации',
       });
+    }
+  }
+
+  async verifyToken(dto: VerifyTokenRequest): Promise<VerifyTokenResponse> {
+    try {
+      const payload = await this.passportService.verifyToken(
+        dto.token,
+        'access',
+      );
+
+      return {
+        isValid: true,
+        ...payload,
+      };
+    } catch {
+      return {
+        isValid: false,
+        userId: '',
+        username: '',
+      };
     }
   }
 }

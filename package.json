@@ -25,10 +25,11 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "*",
     "@nestjs/microservices": "^11.1.16",
     "@nestjs/platform-express": "^11.0.1",
-    "@voice-chat/contracts": "^1.0.9",
+    "@voice-chat/contracts": "^1.0.11",
     "bcrypt": "^6.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

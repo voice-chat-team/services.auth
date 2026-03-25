@@ -1,11 +1,13 @@
 import { Controller } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GrpcMethod } from '@nestjs/microservices';
-import {
-  type RegistrationRequest,
-  type RegistrationResponse,
-  type LoginRequest,
-  type LoginResponse,
+import type {
+  RegistrationRequest,
+  RegistrationResponse,
+  LoginRequest,
+  LoginResponse,
+  VerifyTokenRequest,
+  VerifyTokenResponse,
 } from '@voice-chat/contracts/gen/auth';
 
 @Controller()
@@ -20,5 +22,10 @@ export class AuthController {
   @GrpcMethod('AuthService', 'Registration')
   async registration(dto: RegistrationRequest): Promise<RegistrationResponse> {
     return await this.authService.registrationUser(dto);
+  }
+
+  @GrpcMethod('AuthService', 'VerifyToken')
+  async verifyToken(dto: VerifyTokenRequest): Promise<VerifyTokenResponse> {
+    return await this.authService.verifyToken(dto);
   }
 }
