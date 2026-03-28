@@ -8,7 +8,7 @@ import {
   type VerifyTokenResponse,
 } from '@voice-chat/contracts/gen/auth';
 import { RpcException } from '@nestjs/microservices';
-import { combineLatest, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { UserClientGrpc } from '../user/user.grpc';
 
 import bcrypt from 'bcrypt';
@@ -27,7 +27,7 @@ export class AuthService {
     const { email, password } = dto;
 
     const { user } = await firstValueFrom(
-      this.userClientGrpc.getUserByEmail({ email }),
+      this.userClientGrpc.getUser({ email }),
     );
 
     if (!user)
@@ -56,14 +56,14 @@ export class AuthService {
   async registrationUser(
     dto: RegistrationRequest,
   ): Promise<RegistrationResponse> {
-    const [userByEmail, userByUsername] = await firstValueFrom(
-      combineLatest([
-        this.userClientGrpc.getUserByEmail({ email: dto.email }),
-        this.userClientGrpc.getUserByUsername({ username: dto.username }),
-      ]),
+    const { user: exsistingUser } = await firstValueFrom(
+      this.userClientGrpc.getUser({
+        username: dto.username,
+        email: dto.email,
+      }),
     );
 
-    if (userByEmail.user || userByUsername.user)
+    if (exsistingUser)
       throw new RpcException({
         code: 3,
         details: 'Пользователь с таким email или username уже существует',

@@ -1,11 +1,9 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import type { ClientGrpc } from '@nestjs/microservices';
 import type {
-  GetUserByEmailRequest,
-  GetUserByIdRequest,
   UserServiceClient,
   CreateUserRequest,
-  GetUserByUsernameRequest,
+  GetUserRequest,
 } from '@voice-chat/contracts/gen/user';
 
 @Injectable()
@@ -19,16 +17,8 @@ export class UserClientGrpc implements OnModuleInit {
       this.client.getService<UserServiceClient>('UserService');
   }
 
-  getUserByEmail(request: GetUserByEmailRequest) {
-    return this.userServiceClient.getUserByEmail(request);
-  }
-
-  getUserById(request: GetUserByIdRequest) {
-    return this.userServiceClient.getUserById(request);
-  }
-
-  getUserByUsername(request: GetUserByUsernameRequest) {
-    return this.userServiceClient.getUserByUsername(request);
+  getUser(request: GetUserRequest) {
+    return this.userServiceClient.getUser(request);
   }
 
   createUser(request: CreateUserRequest) {
