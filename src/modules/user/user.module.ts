@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserClientGrpc } from './user.grpc';
+import { PROTO_PATHS } from '@voice-chat/contracts';
 
 @Global()
 @Module({
@@ -12,7 +13,7 @@ import { UserClientGrpc } from './user.grpc';
         transport: Transport.GRPC,
         options: {
           package: 'user.v1',
-          protoPath: 'node_modules/@voice-chat/contracts/proto/user.proto',
+          protoPath: PROTO_PATHS.USER,
           url: 'localhost:50501',
         },
       },

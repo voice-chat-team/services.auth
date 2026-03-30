@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { PROTO_PATHS } from '@voice-chat/contracts';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -9,7 +10,7 @@ async function bootstrap() {
       transport: Transport.GRPC,
       options: {
         package: 'auth.v1',
-        protoPath: 'node_modules/@voice-chat/contracts/proto/auth.proto',
+        protoPath: PROTO_PATHS.AUTH,
         url: 'localhost:5052',
       },
     },
