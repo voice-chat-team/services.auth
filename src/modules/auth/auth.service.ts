@@ -8,7 +8,7 @@ import {
   type VerifyTokenResponse,
 } from '@voice-chat/contracts/gen/auth';
 import { RpcException } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
+
 import { UserClientGrpc } from '../user/user.grpc';
 
 import bcrypt from 'bcrypt';
@@ -27,9 +27,7 @@ export class AuthService {
   async loginUser(dto: LoginRequest): Promise<LoginResponse> {
     const { email, password } = dto;
 
-    const { user } = await firstValueFrom(
-      this.userClientGrpc.getUser({ email }),
-    );
+    const { user } = await this.userClientGrpc.call('getUser', { email });
 
     if (!user)
       throw new RpcException({
@@ -38,7 +36,8 @@ export class AuthService {
       });
 
     const { passwordHash } = user;
-    const isPasswordMatch = await bcrypt.compare(password, passwordHash);
+
+    const isPasswordMatch = await bcrypt.compare(password, passwordHash!);
 
     if (!isPasswordMatch)
       throw new RpcException({
@@ -57,12 +56,10 @@ export class AuthService {
   async registrationUser(
     dto: RegistrationRequest,
   ): Promise<RegistrationResponse> {
-    const { user: exsistingUser } = await firstValueFrom(
-      this.userClientGrpc.getUser({
-        username: dto.username,
-        email: dto.email,
-      }),
-    );
+    const { user: exsistingUser } = await this.userClientGrpc.call('getUser', {
+      username: dto.username,
+      email: dto.email,
+    });
 
     if (exsistingUser)
       throw new RpcException({
@@ -74,13 +71,11 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
     try {
-      const { user } = await firstValueFrom(
-        this.userClientGrpc.createUser({
-          username: dto.username,
-          email: dto.email,
-          passwordHash,
-        }),
-      );
+      const { user } = await this.userClientGrpc.call('createUser', {
+        username: dto.username,
+        email: dto.email,
+        passwordHash,
+      });
 
       return { status: !!user };
     } catch {
