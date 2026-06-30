@@ -20,14 +20,14 @@ const SALT_ROUNDS = 10;
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userClientGrpc: UserClientGrpc,
+    private readonly userClient: UserClientGrpc,
     private readonly passportService: PassportService,
   ) {}
 
   async loginUser(dto: LoginRequest): Promise<LoginResponse> {
     const { email, password } = dto;
 
-    const { user } = await this.userClientGrpc.call('getUser', { email });
+    const { user } = await this.userClient.call('getUser', { email });
 
     if (!user)
       throw new RpcException({
@@ -56,7 +56,7 @@ export class AuthService {
   async registrationUser(
     dto: RegistrationRequest,
   ): Promise<RegistrationResponse> {
-    const { user: exsistingUser } = await this.userClientGrpc.call('getUser', {
+    const { user: exsistingUser } = await this.userClient.call('getUser', {
       username: dto.username,
       email: dto.email,
     });
@@ -71,7 +71,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
     try {
-      const { user } = await this.userClientGrpc.call('createUser', {
+      const { user } = await this.userClient.call('createUser', {
         username: dto.username,
         email: dto.email,
         passwordHash,

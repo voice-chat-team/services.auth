@@ -7,9 +7,10 @@ import { UserModule } from './modules/user/user.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [`.env.${process.env.NODE_ENV}.local`, '.env'],
     }),
-    AuthModule,
     UserModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
